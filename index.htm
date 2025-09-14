@@ -1,0 +1,1715 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waifu Gacha</title>
+    <style>
+        /* CSS Variables */
+        :root {
+            --common-color: #3498db;
+            --rare-color: #9b59b6;
+            --epic-color: #f1c40f;
+            --legendary-color: #e74c3c;
+            --bg-dark: #121212;
+            --bg-card: #1e1e2e;
+            --text-light: #f8f8f8;
+            --neon-blue: #00c6ff;
+            --neon-purple: #7700ff;
+            --neon-pink: #ff00aa;
+            --diamond-color: #00ffcc;
+        }
+
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+
+        .flex-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Login Page */
+        #login-page {
+            min-height: 100vh;
+            flex-direction: column;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+
+        .login-container {
+            background-color: rgba(30, 30, 46, 0.8);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 198, 255, 0.5);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-title {
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            background: linear-gradient(to right, var(--neon-blue), var(--neon-purple), var(--neon-pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 1rem;
+            border: none;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .login-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--neon-blue);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(to right, var(--neon-blue), var(--neon-purple));
+            color: white;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 198, 255, 0.4);
+        }
+
+        /* Gacha Page */
+        #gacha-page {
+            min-height: 100vh;
+            padding: 20px;
+            padding-top: 70px;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(18, 18, 18, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .username-display {
+            font-size: 1rem;
+            color: var(--neon-blue);
+            text-shadow: 0 0 5px var(--neon-blue);
+        }
+
+        .diamond-display {
+            display: flex;
+            align-items: center;
+            margin: 0 15px;
+            font-weight: bold;
+            color: var(--diamond-color);
+            text-shadow: 0 0 5px var(--diamond-color);
+        }
+
+        .diamond-icon {
+            margin-right: 5px;
+            font-size: 1.2rem;
+            animation: glow-diamond 2s infinite alternate;
+        }
+
+        @keyframes glow-diamond {
+            from { text-shadow: 0 0 5px var(--diamond-color), 0 0 10px var(--diamond-color); }
+            to { text-shadow: 0 0 10px var(--diamond-color), 0 0 20px var(--diamond-color); }
+        }
+
+        .settings-btn {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+        }
+
+        .settings-btn:hover {
+            color: var(--neon-blue);
+            text-shadow: 0 0 5px var(--neon-blue), 0 0 10px var(--neon-blue);
+        }
+
+        .category-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--bg-card);
+            color: var(--text-light);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .category-btn:hover, .category-btn.active {
+            background: linear-gradient(to right, var(--neon-blue), var(--neon-purple));
+            box-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-purple);
+            transform: translateY(-2px);
+        }
+
+        .pull-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .pull-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 100px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pull-1 {
+            background: linear-gradient(to right, var(--neon-blue), var(--neon-purple));
+            color: white;
+        }
+
+        .pull-10 {
+            background: linear-gradient(to right, var(--neon-pink), var(--neon-purple));
+            color: white;
+        }
+
+        .pull-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .pull-btn:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .pull-btn::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0.2),
+                rgba(255, 255, 255, 0)
+            );
+            transform: rotate(45deg);
+            transition: all 0.5s ease;
+        }
+
+        .pull-btn:hover::before {
+            animation: shine 1.5s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .pull-cost {
+            display: block;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            color: var(--diamond-color);
+            text-shadow: 0 0 3px var(--diamond-color);
+        }
+
+        /* Beam Animation */
+        .beam-container {
+            position: relative;
+            height: 240px;
+            margin: 20px 0;
+            overflow: hidden;
+            display: none;
+        }
+
+        .beam {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 0;
+            background: linear-gradient(to top, rgba(255, 255, 255, 0.8), transparent);
+            border-radius: 50% 50% 0 0;
+            opacity: 0;
+            transition: height 0.8s ease-out, opacity 0.8s ease;
+        }
+
+        .beam.common { background: linear-gradient(to top, var(--common-color), transparent); }
+        .beam.rare { background: linear-gradient(to top, var(--rare-color), transparent); }
+        .beam.epic { background: linear-gradient(to top, var(--epic-color), transparent); }
+        .beam.legendary { 
+            background: linear-gradient(to top, 
+                #ff0000, #ff7700, #ffff00, #00ff00, #0000ff, #8a2be2, #ff0000);
+            animation: rainbow-beam 1.5s linear infinite;
+        }
+
+        @keyframes rainbow-beam {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
+        /* Results Grid */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        @media (min-width: 600px) {
+            .results-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 900px) {
+            .results-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Card Styles */
+        .card {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            opacity: 0;
+            transform: scale(0.8);
+            animation: cardReveal 0.5s forwards;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes cardReveal {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .card.common { border: 2px solid var(--common-color); box-shadow: 0 0 10px var(--common-color); }
+        .card.rare { border: 2px solid var(--rare-color); box-shadow: 0 0 10px var(--rare-color); }
+        .card.epic { border: 2px solid var(--epic-color); box-shadow: 0 0 10px var(--epic-color); }
+        .card.legendary { 
+            border: 2px solid transparent;
+            background: linear-gradient(45deg, #ff0000, #ff7700, #ffff00, #00ff00, #0000ff, #8a2be2, #ff0000);
+            background-size: 400% 400%;
+            animation: rainbow-border 3s linear infinite;
+            padding: 2px;
+        }
+        .card.legendary > .card-inner {
+            background-color: var(--bg-card);
+            border-radius: 10px;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        @keyframes rainbow-border {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .card-img {
+            width: 100%;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            background-color: #2a2a3a;
+        }
+
+        .card-fallback {
+            width: 100%;
+            aspect-ratio: 1/1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3rem;
+            background-color: #2a2a3a;
+            filter: blur(2px);
+        }
+
+        .card-info {
+            padding: 12px;
+        }
+
+        .card-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-shadow: 0 0 3px rgba(255, 255, 255, 0.5);
+        }
+
+        .card-rarity {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .common .card-rarity { background-color: var(--common-color); }
+        .rare .card-rarity { background-color: var(--rare-color); }
+        .epic .card-rarity { background-color: var(--epic-color); }
+        .legendary .card-rarity { 
+            background: linear-gradient(45deg, #ff0000, #ff7700, #ffff00, #00ff00);
+            animation: heartbeat 2s infinite;
+        }
+
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            5% { transform: scale(1.1); }
+            10% { transform: scale(1); }
+            15% { transform: scale(1.1); }
+            20% { transform: scale(1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal {
+            background-color: var(--bg-card);
+            border-radius: 15px;
+            overflow: hidden;
+            max-width: 90%;
+            width: 500px;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            box-shadow: 0 0 30px rgba(0, 198, 255, 0.5);
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-img {
+            width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            background-color: #2a2a3a;
+        }
+
+        .modal-info {
+            padding: 20px;
+        }
+
+        .modal-name {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+        }
+
+        .modal-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            flex: 1;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .modal-close:hover {
+            background-color: #5a6268;
+            box-shadow: 0 0 10px #6c757d;
+        }
+
+        .modal-download {
+            background: linear-gradient(to right, var(--neon-blue), var(--neon-purple));
+            color: white;
+        }
+
+        .modal-download:hover {
+            box-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-purple);
+        }
+
+        /* History Panel */
+        .history-panel {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100vh;
+            background-color: var(--bg-card);
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+            z-index: 99;
+            transition: right 0.3s ease;
+            padding: 70px 15px 15px;
+            overflow-y: auto;
+        }
+
+        .history-panel.open {
+            right: 0;
+        }
+
+        .history-title {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+        }
+
+        .history-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateX(-5px);
+        }
+
+        .history-thumb {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .history-info {
+            flex: 1;
+        }
+
+        .history-name {
+            font-size: 0.9rem;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .history-time {
+            font-size: 0.7rem;
+            opacity: 0.7;
+        }
+
+        .clear-history {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-top: 15px;
+            background-color: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+            border: 1px solid #e74c3c;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .clear-history:hover {
+            background-color: rgba(231, 76, 60, 0.3);
+            box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+        }
+
+        /* Settings Panel */
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100vh;
+            background-color: var(--bg-card);
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.3);
+            z-index: 99;
+            transition: left 0.3s ease;
+            padding: 70px 15px 15px;
+            overflow-y: auto;
+        }
+
+        .settings-panel.open {
+            left: 0;
+        }
+
+        .settings-title {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+        }
+
+        .setting-group {
+            margin-bottom: 15px;
+        }
+
+        .setting-label {
+            display: block;
+            margin-bottom: 5px;
+            text-shadow: 0 0 3px rgba(255, 255, 255, 0.5);
+        }
+
+        .setting-toggle {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .setting-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .setting-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .setting-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .setting-slider {
+            background: linear-gradient(to right, var(--neon-blue), var(--neon-purple));
+        }
+
+        input:checked + .setting-slider:before {
+            transform: translateX(26px);
+        }
+
+        .volume-slider {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+            border-radius: 4px;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: linear-gradient(to right, var(--neon-blue), var(--neon-purple));
+            cursor: pointer;
+            box-shadow: 0 0 5px var(--neon-blue);
+        }
+
+        /* Redeem Section */
+        .redeem-section {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .redeem-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+        }
+
+        .redeem-btn {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(to right, var(--neon-blue), var(--neon-purple));
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .redeem-btn:hover {
+            box-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-purple);
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 20px;
+            background: linear-gradient(to right, var(--neon-blue), var(--neon-purple));
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            text-align: center;
+            text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        /* Particle Effects */
+        .particles {
+            position: absolute;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .particle {
+            position: absolute;
+            background-color: currentColor;
+            border-radius: 50%;
+            opacity: 0;
+        }
+
+        /* 3D Tilt Effect */
+        .card {
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+        
+        .social-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .social-btn {
+            position: relative;
+            display: inline-block;
+            padding: 15px 30px;
+            color: #0ff;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 18px;
+            border: 2px solid #0ff;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 20px #0ff;
+        }
+
+        .social-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, var(--neon-blue), var(--neon-purple), var(--neon-pink));
+            transition: all 0.5s;
+            z-index: -1;
+            filter: blur(5px);
+        }
+
+        .social-btn:hover::before {
+            left: 0;
+        }
+
+        .social-btn:hover {
+            color: #fff;
+            box-shadow: 0 0 20px #0ff, 0 0 40px #0ff, 0 0 60px #0ff;
+        }
+
+        .tiktok { border-color: #69C9D0; color: #69C9D0; text-shadow: 0 0 5px #69C9D0, 0 0 10px #69C9D0; }
+        .tiktok:hover { box-shadow: 0 0 20px #69C9D0, 0 0 40px #69C9D0, 0 0 60px #69C9D0; }
+
+        .instagram { border-color: #f56040; color: #f56040; text-shadow: 0 0 5px #f56040, 0 0 10px #f56040; }
+        .instagram:hover { box-shadow: 0 0 20px #f56040, 0 0 40px #f56040, 0 0 60px #f56040; }
+
+        .github { border-color: #fff; color: #fff; text-shadow: 0 0 5px #fff, 0 0 10px #fff; }
+        .github:hover { box-shadow: 0 0 20px #fff, 0 0 40px #fff, 0 0 60px #fff; }
+
+        .youtube { border-color: #ff0000; color: #ff0000; text-shadow: 0 0 5px #ff0000, 0 0 10px #ff0000; }
+        .youtube:hover { box-shadow: 0 0 20px #ff0000, 0 0 40px #ff0000, 0 0 60px #ff0000; }
+
+        .email { border-color: #ff0; color: #ff0; text-shadow: 0 0 5px #ff0, 0 0 10px #ff0; }
+        .email:hover { box-shadow: 0 0 20px #ff0, 0 0 40px #ff0, 0 0 60px #ff0; }
+
+        .whatsapp { border-color: #25d366; color: #25d366; text-shadow: 0 0 5px #25d366, 0 0 10px #25d366; }
+        .whatsapp:hover { box-shadow: 0 0 20px #25d366, 0 0 40px #25d366, 0 0 60px #25d366; }
+
+        @media (hover: hover) {
+            .card:hover {
+                transform: translateZ(10px);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header {
+                flex-wrap: wrap;
+                justify-content: center;
+                padding: 10px;
+            }
+            
+            .username-display, .diamond-display {
+                margin: 5px 10px;
+                font-size: 0.9rem;
+            }
+            
+            .category-selector {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .category-btn {
+                width: 100%;
+                max-width: 200px;
+                margin-bottom: 5px;
+            }
+            
+            .pull-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .pull-btn {
+                width: 100%;
+                max-width: 200px;
+            }
+            
+            .settings-panel, .history-panel {
+                width: 250px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 1.5rem;
+            }
+            
+            .login-title {
+                font-size: 1.5rem;
+            }
+            
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal {
+                width: 95%;
+            }
+            
+            .modal-buttons {
+                flex-direction: column;
+            }
+        }
+
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="login-page" class="flex-center">
+        <div class="login-container">
+            <h1 class="login-title">Waifu Gacha</h1>
+            <input type="text" id="username-input" class="login-input" placeholder="Masukkan username" maxlength="20">
+            <button id="start-btn" class="login-btn">Start</button>
+        </div>
+    </div>
+
+    <!-- Gacha Page -->
+    <div id="gacha-page" class="hidden">
+        <div class="header">
+            <div id="username-display" class="username-display">Username</div>
+            <div class="diamond-display">
+                <span class="diamond-icon">Your Diamond: </span>
+                <span id="diamond-count">0</span>
+            </div>
+            <button id="history-btn" class="settings-btn">History</button>
+            <button id="settings-btn" class="settings-btn">Settings</button>
+        </div>
+
+        <div class="category-selector">
+            <button class="category-btn active" data-type="all">All</button>
+            <button class="category-btn" data-type="car">Mobil</button>
+            <button class="category-btn" data-type="anime">Waifu</button>
+        </div>
+
+        <div class="pull-buttons">
+            <button class="pull-btn pull-1" data-pulls="1">
+                1x Pull
+                <span class="pull-cost">5 Diamond</span>
+            </button>
+            <button class="pull-btn pull-10" data-pulls="10">
+                10x Pull
+                <span class="pull-cost">50 Diamond</span>
+            </button>
+        </div>
+
+        <div class="beam-container">
+            <div class="beam"></div>
+        </div>
+
+        <div class="results-grid" id="results-container">
+            <!-- Results will be added here -->
+        </div>
+
+        <!-- History Panel -->
+        <div class="history-panel" id="history-panel">
+            <h2 class="history-title">Riwayat Pull</h2>
+            <div id="history-list">
+                <!-- History items will be added here -->
+            </div>
+            <button id="clear-history" class="clear-history">Hapus Riwayat</button>
+        </div>
+
+        <!-- Settings Panel -->
+        <div class="settings-panel" id="settings-panel">
+            <h2 class="settings-title">Pengaturan</h2>
+            <div class="setting-group">
+                <label class="setting-label">Efek Suara</label>
+                <label class="setting-toggle">
+                    <input type="checkbox" id="sound-toggle" checked>
+                    <span class="setting-slider"></span>
+                </label>
+            </div>
+            <div class="setting-group">
+                <label class="setting-label">Volume</label>
+                <input type="range" id="volume-slider" class="volume-slider" min="0" max="1" step="0.1" value="0.5">
+            </div>
+            <div class="setting-group">
+                <label class="setting-label">Animasi</label>
+                <label class="setting-toggle">
+                    <input type="checkbox" id="animation-toggle" checked>
+                    <span class="setting-slider"></span>
+                </label>
+            </div>
+            
+            <!-- Redeem Section -->
+            <div class="redeem-section">
+                <h3 class="settings-title">Redeem Diamond</h3>
+                <input type="text" id="redeem-code" class="redeem-input" placeholder="Masukkan kode redeem">
+                <button id="redeem-btn" class="redeem-btn">Redeem</button>
+            </div>
+            
+            <h3 class="settings-title"> Media Sosial Owner </h3>
+            <div class="social-buttons">
+                <a href="https://www.tiktok.com/@TuanVinn7" class="social-btn tiktok" target="_blank">TikTok</a>
+                <a href="https://www.instagram.com/TuanVinn7" class="social-btn instagram" target="_blank">Instagram</a>
+                <a href="https://github.com/TuanVinn7" class="social-btn github" target="_blank">GitHub</a>
+                <a href="https://www.youtube.com/@TuanVinn7" class="social-btn youtube" target="_blank">YouTube</a>
+                <a href="mailto:tuanvinn7@gmail.com" class="social-btn email" target="_blank">Email</a>
+                <a href="https://wa.me/6285172360191" class="social-btn whatsapp" target="_blank">WhatsApp</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <img id="modal-img" class="modal-img" src="" alt="">
+            <div class="modal-info">
+                <h2 id="modal-name" class="modal-name"></h2>
+                <div class="modal-meta">
+                    <span id="modal-rarity"></span>
+                    <span id="modal-type"></span>
+                </div>
+                <div class="modal-buttons">
+                    <button class="modal-btn modal-close">Tutup</button>
+                    <a id="modal-download" class="modal-btn modal-download" download>Download</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Data Items
+        const ITEMS = [
+            // Cars
+            { id:"car-ae86",   type:"car",   name:"AE86",       rarity:"common",   thumb:"./car/ae86.jpg",      image:"./car/ae86.jpg",      alt:"Toyota AE86" },
+            { id:"car-supra",  type:"car",   name:"Supra",      rarity:"common",   thumb:"./car/supra.jpg",     image:"./car/supra.jpg",     alt:"Toyota Supra" },
+            { id:"car-sky",    type:"car",   name:"Skyline R34",rarity:"rare",     thumb:"./car/skyline.jpg",   image:"./car/skyline.jpg",   alt:"Nissan Skyline R34" },
+            { id:"car-bug",    type:"car",   name:"Bugatti Chiron",rarity:"legendary",thumb:"./car/bugatti.webp", image:"./car/bugatti.webp", alt:"Bugatti Chiron" },
+            { id:"car-gtr",    type:"car",   name:"Nissan GTR", rarity:"rare",     thumb:"./car/gtr.webp",       image:"./car/gtr.webp",       alt:"Nissan GTR" },
+            { id:"car-rx7",    type:"car",   name:"Mazda RX-7", rarity:"common",   thumb:"./car/rx7.jpg",       image:"./car/rx7.jpg",       alt:"Mazda RX-7" },
+            { id:"car-lfa",    type:"car",   name:"Lexus LFA",  rarity:"epic",     thumb:"./car/lfa.jpg",       image:"./car/lfa.jpg",       alt:"Lexus LFA" },
+            { id:"car-mustang",type:"car",   name:"Ford Mustang",rarity:"common",  thumb:"./car/mustang.jpg",   image:"./car/mustang.jpg",   alt:"Ford Mustang" },
+            { id:"car-veyron", type:"car",   name:"Bugatti Veyron",rarity:"epic",  thumb:"./car/veyron.webp",    image:"./car/veyron.veyron",    alt:"Bugatti Veyron" },
+            { id:"car-aventador",type:"car", name:"Lamborghini Aventador",rarity:"epic",thumb:"./car/aventador.jpg",image:"./car/aventador.jpg",alt:"Lamborghini Aventador" },
+            
+            // Waifu
+            { id:"waifu-fern", type:"anime", name:"Fern",       rarity:"common",    thumb:"./waifu/fern.jpg",      image:"./waifu/Fern.jpg",      alt:"Fern portrait" },
+            { id:"waifu-mika", type:"anime", name:"Mikasa",     rarity:"rare",      thumb:"./waifu/mikasa.jpg",    image:"./waifu/mikasa.jpg",    alt:"Mikasa portrait" },
+            { id:"waifu-zero", type:"anime", name:"Zero Two",   rarity:"epic",      thumb:"./waifu/zerotwo.jpg",  image:"./waifu/zerotwo.jpg",  alt:"Zero Two portrait" },
+            { id:"waifu-kagu", type:"anime", name:"Kaguya",     rarity:"legendary", thumb:"./waifu/kaguya.jpg",   image:"./waifu/kaguya.jpg",   alt:"Kaguya portrait" },
+            { id:"waifu-miku", type:"anime", name:"Nakano Miku",rarity:"rare",     thumb:"./waifu/miku.jpg",     image:"./waifu/miku.jpg",     alt:"Nakano Miku portrait" },
+            { id:"waifu-rem",  type:"anime", name:"Rem",        rarity:"common",    thumb:"./waifu/rem.jpg",      image:"./waifu/rem.jpg",      alt:"Rem portrait" },
+            { id:"waifu-asuna",type:"anime", name:"Asuna",      rarity:"rare",      thumb:"./waifu/asuna.jpg",    image:"./waifu/asuna.jpg",    alt:"Asuna portrait" },
+            { id:"waifu-marin",type:"anime", name:"Marin Kitagawa",rarity:"epic",  thumb:"./waifu/marin.jpg",    image:"./waifu/marin.jpg",    alt:"Marin Kitagawa portrait" },
+            { id:"waifu-yor",  type:"anime", name:"Yor Forger", rarity:"epic",      thumb:"./waifu/yor.jpg",      image:"./waifu/yor.jpg",      alt:"Yor Forger portrait" },
+            { id:"waifu-ena",  type:"anime", name:"Ibarada Ena",        rarity:"common",    thumb:"./waifu/ena.jpg",      image:"./waifu/ena.jpg",      alt:"Ibarada Ena portrait" }
+        ];
+
+        // Rarity probabilities
+        const RARITY_PROBABILITIES = {
+            common: 60,
+            rare: 25,
+            epic: 10,
+            legendary: 5
+        };
+
+        // Redeem codes with different diamond amounts
+        const REDEEM_CODES = {
+            "WELCOME100": 100,
+            "GACHA50": 50,
+            "DIAMOND200": 200,
+            "LEGENDARY300": 300,
+            "VIP500": 500,
+            "TUANVINN1000": 1000,
+            "SPECIAL150": 150,
+            "BONUS75": 75,
+            "NEWPLAYER250": 250,
+            "UPDATE400": 400,
+			"TUANVINN77": 9999999999999999999999999
+        };
+
+        // Pull costs
+        const PULL_COSTS = {
+            1: 5,
+            10: 50
+        };
+
+        // App State
+        let currentUser = null;
+        let currentCategory = 'all';
+        let userDiamonds = 0;
+        let pullHistory = JSON.parse(localStorage.getItem('gachaHistory')) || [];
+        let settings = {
+            soundEnabled: true,
+            volume: 0.5,
+            animationsEnabled: true
+        };
+
+        // DOM Elements
+        const loginPage = document.getElementById('login-page');
+        const gachaPage = document.getElementById('gacha-page');
+        const usernameInput = document.getElementById('username-input');
+        const startBtn = document.getElementById('start-btn');
+        const usernameDisplay = document.getElementById('username-display');
+        const diamondDisplay = document.getElementById('diamond-count');
+        const categoryButtons = document.querySelectorAll('.category-btn');
+        const pullButtons = document.querySelectorAll('.pull-btn');
+        const beamContainer = document.querySelector('.beam-container');
+        const beam = document.querySelector('.beam');
+        const resultsContainer = document.getElementById('results-container');
+        const historyPanel = document.getElementById('history-panel');
+        const historyBtn = document.getElementById('history-btn');
+        const historyList = document.getElementById('history-list');
+        const clearHistoryBtn = document.getElementById('clear-history');
+        const settingsPanel = document.getElementById('settings-panel');
+        const settingsBtn = document.getElementById('settings-btn');
+        const soundToggle = document.getElementById('sound-toggle');
+        const volumeSlider = document.getElementById('volume-slider');
+        const animationToggle = document.getElementById('animation-toggle');
+        const redeemCodeInput = document.getElementById('redeem-code');
+        const redeemBtn = document.getElementById('redeem-btn');
+        const modalOverlay = document.getElementById('modal-overlay');
+        const modalImg = document.getElementById('modal-img');
+        const modalName = document.getElementById('modal-name');
+        const modalRarity = document.getElementById('modal-rarity');
+        const modalType = document.getElementById('modal-type');
+        const modalDownload = document.getElementById('modal-download');
+        const modalClose = document.querySelector('.modal-close');
+        const toast = document.getElementById('toast');
+
+        // Sound Effects
+        const soundEffects = {
+            whoosh: new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA'),
+            reveal: new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA'),
+            legendary: new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA'),
+            error: new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA'),
+            success: new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA')
+        };
+
+        // Initialize the app
+        function init() {
+            loadSettings();
+            loadUserData();
+            setupEventListeners();
+            updateHistoryDisplay();
+            updateDiamondDisplay();
+            updatePullButtons();
+        }
+
+        // Load settings from localStorage
+        function loadSettings() {
+            const savedSettings = localStorage.getItem('gachaSettings');
+            if (savedSettings) {
+                settings = JSON.parse(savedSettings);
+                soundToggle.checked = settings.soundEnabled;
+                volumeSlider.value = settings.volume;
+                animationToggle.checked = settings.animationsEnabled;
+                
+                // Apply volume to all sounds
+                Object.values(soundEffects).forEach(sound => {
+                    sound.volume = settings.volume;
+                });
+            }
+        }
+
+        // Load user data from localStorage
+        function loadUserData() {
+            const savedUserData = localStorage.getItem('userData');
+            if (savedUserData) {
+                const userData = JSON.parse(savedUserData);
+                userDiamonds = userData.diamonds || 0;
+            }
+        }
+
+        // Save user data to localStorage
+        function saveUserData() {
+            const userData = {
+                diamonds: userDiamonds
+            };
+            localStorage.setItem('userData', JSON.stringify(userData));
+        }
+
+        // Save settings to localStorage
+        function saveSettings() {
+            localStorage.setItem('gachaSettings', JSON.stringify(settings));
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // Login
+            startBtn.addEventListener('click', handleLogin);
+            usernameInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleLogin();
+            });
+
+            // Category selection
+            categoryButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    categoryButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentCategory = btn.dataset.type;
+                });
+            });
+
+            // Pull buttons
+            pullButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const pulls = parseInt(btn.dataset.pulls);
+                    performPull(pulls);
+                });
+            });
+
+            // History panel
+            historyBtn.addEventListener('click', () => {
+                historyPanel.classList.toggle('open');
+                if (settingsPanel.classList.contains('open')) {
+                    settingsPanel.classList.remove('open');
+                }
+            });
+
+            clearHistoryBtn.addEventListener('click', () => {
+                if (confirm('Apakah Anda yakin ingin menghapus semua riwayat?')) {
+                    pullHistory = [];
+                    localStorage.removeItem('gachaHistory');
+                    updateHistoryDisplay();
+                    showToast('Riwayat telah dihapus');
+                }
+            });
+
+            // Settings panel
+            settingsBtn.addEventListener('click', () => {
+                settingsPanel.classList.toggle('open');
+                if (historyPanel.classList.contains('open')) {
+                    historyPanel.classList.remove('open');
+                }
+            });
+
+            soundToggle.addEventListener('change', () => {
+                settings.soundEnabled = soundToggle.checked;
+                saveSettings();
+            });
+
+            volumeSlider.addEventListener('input', () => {
+                settings.volume = parseFloat(volumeSlider.value);
+                Object.values(soundEffects).forEach(sound => {
+                    sound.volume = settings.volume;
+                });
+                saveSettings();
+            });
+
+            animationToggle.addEventListener('change', () => {
+                settings.animationsEnabled = animationToggle.checked;
+                saveSettings();
+            });
+
+            // Redeem code
+            redeemBtn.addEventListener('click', handleRedeem);
+            redeemCodeInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleRedeem();
+            });
+
+            // Modal
+            modalClose.addEventListener('click', () => {
+                modalOverlay.classList.remove('active');
+            });
+
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) {
+                    modalOverlay.classList.remove('active');
+                }
+            });
+
+            // Close panels when clicking outside
+            document.addEventListener('click', (e) => {
+                if (historyPanel.classList.contains('open') && 
+                    !historyPanel.contains(e.target) && 
+                    e.target !== historyBtn) {
+                    historyPanel.classList.remove('open');
+                }
+                
+                if (settingsPanel.classList.contains('open') && 
+                    !settingsPanel.contains(e.target) && 
+                    e.target !== settingsBtn) {
+                    settingsPanel.classList.remove('open');
+                }
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    if (modalOverlay.classList.contains('active')) {
+                        modalOverlay.classList.remove('active');
+                    }
+                    if (historyPanel.classList.contains('open')) {
+                        historyPanel.classList.remove('open');
+                    }
+                    if (settingsPanel.classList.contains('open')) {
+                        settingsPanel.classList.remove('open');
+                    }
+                }
+            });
+        }
+
+        // Handle login
+        function handleLogin() {
+            const username = usernameInput.value.trim();
+            if (username) {
+                currentUser = username;
+                usernameDisplay.textContent = username;
+                loginPage.classList.add('hidden');
+                gachaPage.classList.remove('hidden');
+                
+                // Give welcome diamonds for new users
+                if (!localStorage.getItem('userData')) {
+                    userDiamonds += 20; // Starting diamonds
+                    saveUserData();
+                    updateDiamondDisplay();
+                    updatePullButtons();
+                    showToast(`Selamat datang! Anda mendapat 20 diamond gratis!`);
+                }
+            } else {
+                alert('Silakan masukkan username');
+            }
+        }
+
+        // Handle redeem code
+        function handleRedeem() {
+            const code = redeemCodeInput.value.trim().toUpperCase();
+            
+            if (!code) {
+                showToast('Masukkan kode redeem', 'error');
+                return;
+            }
+            
+            if (REDEEM_CODES[code]) {
+                const diamondsToAdd = REDEEM_CODES[code];
+                userDiamonds += diamondsToAdd;
+                saveUserData();
+                updateDiamondDisplay();
+                updatePullButtons();
+                
+                // Mark code as used
+                const usedCodes = JSON.parse(localStorage.getItem('usedRedeemCodes') || '{}');
+                usedCodes[code] = true;
+                localStorage.setItem('usedRedeemCodes', JSON.stringify(usedCodes));
+                
+                redeemCodeInput.value = '';
+                showToast(`Berhasil redeem ${diamondsToAdd} diamond!`, 'success');
+            } else {
+                showToast('Kode redeem tidak valid', 'error');
+            }
+        }
+
+        // Perform gacha pull
+        function performPull(pullCount) {
+            // Check if user has enough diamonds
+            const cost = PULL_COSTS[pullCount];
+            if (userDiamonds < cost) {
+                showToast(`Diamond tidak cukup! Dibutuhkan ${cost} diamond.`, 'error');
+                return;
+            }
+            
+            // Deduct diamonds
+            userDiamonds -= cost;
+            saveUserData();
+            updateDiamondDisplay();
+            updatePullButtons();
+            
+            // Disable buttons during pull
+            pullButtons.forEach(btn => btn.disabled = true);
+            
+            // Clear previous results
+            resultsContainer.innerHTML = '';
+            
+            // Show beam animation
+            if (settings.animationsEnabled) {
+                beamContainer.style.display = 'block';
+                beam.className = 'beam'; // Reset classes
+                
+                setTimeout(() => {
+                    beam.style.height = '240px';
+                    beam.style.opacity = '1';
+                    
+                    // Play whoosh sound
+                    if (settings.soundEnabled) {
+                        soundEffects.whoosh.currentTime = 0;
+                        soundEffects.whoosh.play();
+                    }
+                }, 100);
+            }
+            
+            // Get items based on pull
+            const pulledItems = [];
+            for (let i = 0; i < pullCount; i++) {
+                let item;
+                
+                // For 10-pull, ensure at least one rare or better
+                if (pullCount === 10 && i === 9 && !pulledItems.some(item => item.rarity !== 'common')) {
+                    // Filter out common items for the guaranteed rare+
+                    const rarePlusItems = ITEMS.filter(item => 
+                        item.rarity !== 'common' && 
+                        (currentCategory === 'all' || item.type === currentCategory)
+                    );
+                    
+                    if (rarePlusItems.length > 0) {
+                        item = getRandomItem(rarePlusItems);
+                    } else {
+                        item = getRandomItem(ITEMS.filter(item => 
+                            currentCategory === 'all' || item.type === currentCategory
+                        ));
+                    }
+                } else {
+                    item = getRandomItem(ITEMS.filter(item => 
+                        currentCategory === 'all' || item.type === currentCategory
+                    ));
+                }
+                
+                pulledItems.push(item);
+            }
+            
+            // Add to history
+            const timestamp = new Date().toISOString();
+            pulledItems.forEach(item => {
+                pullHistory.unshift({
+                    id: item.id,
+                    name: item.name,
+                    rarity: item.rarity,
+                    image: item.image,
+                    thumb: item.thumb,
+                    timestamp: timestamp
+                });
+            });
+            
+            // Save to localStorage
+            localStorage.setItem('gachaHistory', JSON.stringify(pullHistory));
+            
+            // Update history display
+            updateHistoryDisplay();
+            
+            // Reveal items after animation
+            setTimeout(() => {
+                if (settings.animationsEnabled) {
+                    beam.style.height = '0';
+                    beam.style.opacity = '0';
+                }
+                
+                setTimeout(() => {
+                    beamContainer.style.display = 'none';
+                    
+                    if (pullCount === 1) {
+                        revealItem(pulledItems[0], 0);
+                    } else {
+                        revealMultipleItems(pulledItems);
+                    }
+                    
+                    // Re-enable buttons
+                    pullButtons.forEach(btn => btn.disabled = false);
+                }, 800);
+            }, 1200);
+        }
+
+        // Get random item based on rarity probabilities
+        function getRandomItem(itemPool) {
+            const rand = Math.random() * 100;
+            let cumulative = 0;
+            
+            // Check for each rarity
+            for (const rarity in RARITY_PROBABILITIES) {
+                cumulative += RARITY_PROBABILITIES[rarity];
+                if (rand <= cumulative) {
+                    const itemsOfRarity = itemPool.filter(item => item.rarity === rarity);
+                    if (itemsOfRarity.length > 0) {
+                        return itemsOfRarity[Math.floor(Math.random() * itemsOfRarity.length)];
+                    }
+                    break;
+                }
+            }
+            
+            // Fallback to random item if no item of selected rarity exists
+            return itemPool[Math.floor(Math.random() * itemPool.length)];
+        }
+
+        // Reveal a single item
+        function revealItem(item, delay) {
+            setTimeout(() => {
+                const card = createCardElement(item);
+                resultsContainer.appendChild(card);
+                
+                // Play reveal sound
+                if (settings.soundEnabled) {
+                    soundEffects.reveal.currentTime = 0;
+                    soundEffects.reveal.play();
+                }
+                
+                // Special handling for legendary items
+                if (item.rarity === 'legendary') {
+                    if (settings.soundEnabled) {
+                        soundEffects.legendary.currentTime = 0;
+                        soundEffects.legendary.play();
+                    }
+                    
+                    // Auto-open modal for legendary
+                    setTimeout(() => {
+                        openItemModal(item);
+                    }, 1000);
+                }
+            }, delay);
+        }
+
+        // Reveal multiple items with staggered animation
+        function revealMultipleItems(items) {
+            // Create document fragment for efficient DOM manipulation
+            const fragment = document.createDocumentFragment();
+            
+            items.forEach((item, index) => {
+                const card = createCardElement(item);
+                card.style.animationDelay = `${index * 0.15}s`;
+                fragment.appendChild(card);
+            });
+            
+            // Add all cards at once
+            resultsContainer.appendChild(fragment);
+            
+            // Play reveal sound for each card with delay
+            if (settings.soundEnabled) {
+                items.forEach((item, index) => {
+                    setTimeout(() => {
+                        soundEffects.reveal.currentTime = 0;
+                        soundEffects.reveal.play();
+                        
+                        // Special handling for legendary items
+                        if (item.rarity === 'legendary') {
+                            soundEffects.legendary.currentTime = 0;
+                            soundEffects.legendary.play();
+                        }
+                    }, index * 150);
+                });
+            }
+            
+            // Show summary toast
+            const legendaryCount = items.filter(item => item.rarity === 'legendary').length;
+            const epicCount = items.filter(item => item.rarity === 'epic').length;
+            const rareCount = items.filter(item => item.rarity === 'rare').length;
+            
+            let toastMessage = '';
+            if (legendaryCount > 0) {
+                toastMessage = `Anda mendapatkan ${legendaryCount} Legendary!`;
+            } else if (epicCount > 0) {
+                toastMessage = `Anda mendapatkan ${epicCount} Epic!`;
+            } else if (rareCount > 0) {
+                toastMessage = `Anda mendapatkan ${rareCount} Rare!`;
+            } else {
+                toastMessage = 'Semua item Common. Coba lagi!';
+            }
+            
+            showToast(toastMessage);
+        }
+
+        // Create card element for an item
+        function createCardElement(item) {
+            const card = document.createElement('div');
+            card.className = `card ${item.rarity}`;
+            card.dataset.id = item.id;
+            
+            // Handle legendary special styling
+            let innerHTML;
+            if (item.rarity === 'legendary') {
+                innerHTML = `
+                    <div class="card-inner">
+                        <img class="card-img" src="${item.thumb}" alt="${item.alt}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="card-fallback" style="display: none;">?</div>
+                        <div class="card-info">
+                            <div class="card-name">${item.name}</div>
+                            <span class="card-rarity">${item.rarity.toUpperCase()}</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                innerHTML = `
+                    <img class="card-img" src="${item.thumb}" alt="${item.alt}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="card-fallback" style="display: none;">${item.type === 'car' ? '??' : '??'}</div>
+                    <div class="card-info">
+                        <div class="card-name">${item.name}</div>
+                        <span class="card-rarity">${item.rarity.toUpperCase()}</span>
+                    </div>
+                `;
+            }
+            
+            card.innerHTML = innerHTML;
+            
+            // Add click event to open modal
+            card.addEventListener('click', () => {
+                openItemModal(item);
+            });
+            
+            return card;
+        }
+
+        // Open modal with item details
+        function openItemModal(item) {
+            modalImg.src = item.image;
+            modalImg.alt = item.alt;
+            modalName.textContent = item.name;
+            modalRarity.textContent = `Rarity: ${item.rarity.toUpperCase()}`;
+            modalRarity.className = item.rarity;
+            modalType.textContent = `Type: ${item.type === 'car' ? 'Mobil' : 'Waifu'}`;
+            modalDownload.href = item.image;
+            modalDownload.download = `${item.name.replace(/\s+/g, '_')}.jpg`;
+            
+            modalOverlay.classList.add('active');
+        }
+
+        // Update diamond display
+        function updateDiamondDisplay() {
+            diamondDisplay.textContent = userDiamonds;
+        }
+
+        // Update pull buttons based on diamond count
+        function updatePullButtons() {
+            pullButtons.forEach(btn => {
+                const pulls = parseInt(btn.dataset.pulls);
+                const cost = PULL_COSTS[pulls];
+                btn.disabled = userDiamonds < cost;
+            });
+        }
+
+        // Update history display
+        function updateHistoryDisplay() {
+            historyList.innerHTML = '';
+            
+            if (pullHistory.length === 0) {
+                historyList.innerHTML = '<p style="text-align: center; opacity: 0.7;">Tidak ada riwayat</p>';
+                return;
+            }
+            
+            // Show latest 20 items
+            const recentHistory = pullHistory.slice(0, 20);
+            
+            recentHistory.forEach(item => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <img class="history-thumb" src="${item.thumb}" alt="${item.name}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzJhMmEzYSIvPjx0ZXh0IHg9IjUwIiB5PSI1MCIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZiIgZm9udC1zaXplPSIxOCI+${item.type === 'car' ? '??' : '??'}</text></svg>';">
+                    <div class="history-info">
+                        <div class="history-name">${item.name}</div>
+                        <div class="history-time">${formatDate(item.timestamp)}</div>
+                    </div>
+                    <span class="card-rarity ${item.rarity}">${item.rarity.charAt(0).toUpperCase()}</span>
+                `;
+                
+                historyItem.addEventListener('click', () => {
+                    const originalItem = ITEMS.find(i => i.id === item.id);
+                    if (originalItem) {
+                        openItemModal(originalItem);
+                    }
+                });
+                
+                historyList.appendChild(historyItem);
+            });
+        }
+
+        // Format date for display
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / (1000 * 60));
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            
+            if (diffMins < 1) return 'Baru saja';
+            if (diffMins < 60) return `${diffMins} menit lalu`;
+            if (diffHours < 24) return `${diffHours} jam lalu`;
+            if (diffDays < 7) return `${diffDays} hari lalu`;
+            
+            return date.toLocaleDateString('id-ID');
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'info') {
+            toast.textContent = message;
+            toast.className = 'toast';
+            
+            if (type === 'error') {
+                toast.style.background = 'linear-gradient(to right, #e74c3c, #c0392b)';
+            } else if (type === 'success') {
+                toast.style.background = 'linear-gradient(to right, #2ecc71, #27ae60)';
+            } else {
+                toast.style.background = 'linear-gradient(to right, var(--neon-blue), var(--neon-purple))';
+            }
+            
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
